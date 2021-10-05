@@ -1,7 +1,7 @@
 //Storage Controller
-const StorageController = (function() {
-       console.log('Storage Controller');
-})();
+// const StorageController = (function() {
+//        console.log('Storage Controller');
+// })();
 
 //Item Controller
 const ItemsController = (function() {
@@ -29,8 +29,27 @@ const ItemsController = (function() {
           getData: function () {
               return data.items;
           },
+
+          addData : function(name ,calories){
+              let ID;
+              if(data.items.length > 0){
+                ID = data.items[data.items.length -1].id + 1
+              }else{
+                  ID = 0
+              }
+
+              calories = parseInt(calories)
+
+              const newItem = new Item(ID, name, calories)
+              
+
+              data.items.push(newItem);
+           
+              return newItem
+          },
+
           logData : function () {
-              return data;
+             return data
           }
       }
 
@@ -39,10 +58,13 @@ const ItemsController = (function() {
 
 //UI Controller
 const UIController = (function() {
-   
     const UISelectors = {
-        itemList : '#item-list'
+        itemList : '#item-list',
+        addBtn : '.add-btn',
+        itemName : '#item-name',
+        itemCalories : '#item-calories'
     }
+
     return {
         populateListItems : function (items) {
             let  listitems = '';
@@ -58,14 +80,52 @@ const UIController = (function() {
              });
 
              document.querySelector(UISelectors.itemList).innerHTML = listitems;
+             
 
+        },
+        getSelectors: function(){
+            return UISelectors
+        },
+        getItemInput: function(){
+            return {
+                name : document.querySelector(UISelectors.itemName).value,
+                calories :document.querySelector(UISelectors.itemCalories).value
+            }
         }
+        
     }
 })();
 
 
 //App Controller
 const AppController = (function(ItemsController, UIController) {
+   //Load Event Listeners
+    const loadEventListeners = function(){
+        //Get UI Selectors
+        const UISelectors = UIController.getSelectors()
+
+        //Add meal btn event listener
+        document.querySelector(UISelectors.addBtn).addEventListener('click',itemAddSubmit);
+
+    }
+
+    const itemAddSubmit = function(e){
+        //Get UI Selectors
+        const UISelectors = UIController.getSelectors()
+        
+       //Get input items
+       const inputs = UIController.getItemInput()
+
+       if(inputs.name !== '' && inputs.calories !== ''){
+          const newItem = ItemsController.addData(inputs.name,inputs.calories);
+       }else{
+           //Flash message to enter correct inputs
+       }
+       
+        e.preventDefault();
+     }
+
+   
 
   //Init
   return{
@@ -73,7 +133,8 @@ const AppController = (function(ItemsController, UIController) {
           const items = ItemsController.getData();
 
           UIController.populateListItems(items);
-       
+          loadEventListeners()
+          
       }
   }
 })(ItemsController, UIController);
