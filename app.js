@@ -86,6 +86,26 @@ const UIController = (function() {
         getSelectors: function(){
             return UISelectors
         },
+        addListItem: function(item){
+            const li = document.createElement('li');
+            li.className = 'collection-item';
+
+            li.id = `item-${item.id}`;
+
+            li.innerHTML = `
+            <strong> ${item.name}: </strong> <em>${item.calories}Calories</em>
+            <a href="#" class="secondary-content">
+              <i class="edit-item fa fa-pencil"></i>
+            </a>`;
+
+             //Insert Item
+             document.querySelector(UISelectors.itemList).insertAdjacentElement('beforeend', li);
+           
+        },
+        clearInputs: function () {
+             document.querySelector(UISelectors.itemName).value = '';
+             document.querySelector(UISelectors.itemCalories).value = '';
+        },
         getItemInput: function(){
             return {
                 name : document.querySelector(UISelectors.itemName).value,
@@ -117,7 +137,14 @@ const AppController = (function(ItemsController, UIController) {
        const inputs = UIController.getItemInput()
 
        if(inputs.name !== '' && inputs.calories !== ''){
+           //Add Item
           const newItem = ItemsController.addData(inputs.name,inputs.calories);
+
+          //Add Item to the UI
+          UIController.addListItem(newItem);
+
+          //Clear Inputs
+          UIController.clearInputs();
        }else{
            //Flash message to enter correct inputs
        }
